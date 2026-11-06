@@ -1,0 +1,7 @@
+# 이 파일에는 이미지를 만들 때 복사 대상에서 제외할 항목을 적는다. (backend 용)
+
+.venv
+__pycache__
+*.pyc
+.git
+.env*

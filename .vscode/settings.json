@@ -1,0 +1,10 @@
+{
+    "cSpell.words": [
+        "appendonly",
+        "fastapi",
+        "pydantic",
+        "requirepass",
+        "sqlalchemy",
+        "uvicorn"
+    ]
+}

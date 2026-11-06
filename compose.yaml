@@ -1,0 +1,76 @@
+services:
+
+    frontend:
+        build:
+            # build.context: frontend/Dockerfile 로 이미지 생성
+            context: ./frontend
+        ports:
+            # 맥의 5175 port 를 컨테이너의 3000 port 에 연결
+            - "127.0.0.1:5175:3000"
+        volumes:
+            # 왼쪽:오른쪽 -> 왼쪽의 저장공간을 오른쪽에 컨테이너 경로에 연결해라 라는 의미.
+            # 로컬의 frontend 파일을 컨테이너 기본 폴더로 지정한 /app 과 연결.(Dockerfile 참고.)
+            - ./frontend:/app
+            # /app/node_modules: npm의 패키지 설치 방식
+            # 운영체제가 달라져도 문제 없도록 설치한 외부 패키지는 컨테이너에도 따로 보관.
+            - frontend_node_modules:/app/node_modules
+            # /app/.next: Next.js 프로젝트 구조, 빌드 설명 
+            # 작성한 소스를 브라우저와 서버에서 실행할 형태로 빌드한 결과물과, 다음 변환을 빠르게 처리하기 위해 쌓이는 캐시 등이 .next 폴더에 들어간다.
+            - frontend_next:/app/.next
+
+    backend:
+        build:
+            # backend Dockerfile 로 이미지 생성
+            context: ./backend
+        ports:
+            # 맥의 8002 를 컨테이너의 8000 에 연결
+            - "127.0.0.1:8002:8000"
+        volumes:
+            # backend 소스를 연결해서 수정 사항 반영
+            # 파이썬 패키지는 /app 바깥의 파이썬 설치 경로에 설치되므로,
+            # 프론트의 node_modules 처럼 별도 볼륨을 추가할 필요할 필요는 없다.
+            - ./backend:/app
+        environment:
+            MYSQL_HOST: mysql
+            MYSQL_PORT: "3306"
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            REDIS_HOST: redis
+            REDIS_PORT: "6379"
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
+    
+    mysql:
+        image: mysql:8.4
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - "127.0.0.1:${MYSQL_PORT:-3309}:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+    
+    redis:
+        image: redis:8-alpine
+        command:
+            - redis-server
+            - --appendonly
+            - "yes"
+            # --requirepass: 접속할 때 비밀번호를 요구하는 옵션
+            - --requirepass
+            # 변수가 없거나 비어 있으면 실행을 중단해서, 빠진 설정을 알아차리게 한다.
+            - "${REDIS_PASSWORD:?REDIS_PASSWORD is required}"
+        volumes:
+            - redis_data:/data
+
+
+# Docker가 관리할 볼륨(저장공간) 이름을 정한다.
+volumes:
+    # 컨테이너용 패키지를 별도 보관 (Next.js, React, TypeScript 등)
+    frontend_node_modules:
+    # Next.js가 생성하는 빌드,캐시 파일을 별도 보관
+    frontend_next:
+    mysql_data:
+    redis_data:

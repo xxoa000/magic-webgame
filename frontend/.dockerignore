@@ -1,0 +1,6 @@
+# 이 파일에는 이미지를 만들 때 복사 대상에서 제외할 항목을 적는다. (frontend 용)
+node_modules
+.next
+.git
+.env*
+npm-debug.log*
