@@ -5,8 +5,8 @@ services:
             # build.context: frontend/Dockerfile 로 이미지 생성
             context: ./frontend
         ports:
-            # 맥의 5175 port 를 컨테이너의 3000 port 에 연결
-            - "127.0.0.1:5175:3000"
+            # 맥의 3003 port 를 컨테이너의 3000 port 에 연결
+            - "127.0.0.1:${FRONT_PORT}:3000"
         volumes:
             # 왼쪽:오른쪽 -> 왼쪽의 저장공간을 오른쪽에 컨테이너 경로에 연결해라 라는 의미.
             # 로컬의 frontend 파일을 컨테이너 기본 폴더로 지정한 /app 과 연결.(Dockerfile 참고.)
@@ -23,8 +23,8 @@ services:
             # backend Dockerfile 로 이미지 생성
             context: ./backend
         ports:
-            # 맥의 8002 를 컨테이너의 8000 에 연결
-            - "127.0.0.1:8002:8000"
+            # 맥의 8003 를 컨테이너의 8000 에 연결
+            - "127.0.0.1:${BACK_PORT}:8000"
         volumes:
             # backend 소스를 연결해서 수정 사항 반영
             # 파이썬 패키지는 /app 바깥의 파이썬 설치 경로에 설치되므로,
@@ -32,12 +32,12 @@ services:
             - ./backend:/app
         environment:
             MYSQL_HOST: mysql
-            MYSQL_PORT: "3306"
+            MYSQL_PORT: ${MYSQL_PORT}           # 3309
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
             REDIS_HOST: redis
-            REDIS_PORT: "6379"
+            REDIS_PORT: ${REDIS_PORT}           # 6382
             REDIS_PASSWORD: ${REDIS_PASSWORD}
     
     mysql:
