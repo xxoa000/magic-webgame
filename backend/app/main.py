@@ -9,7 +9,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import v1_router
+from app.api.v1.v1_router import v1_router
 
 
 app = FastAPI()
@@ -20,7 +20,7 @@ app.include_router(v1_router)
 """ Next.js 화면에서 FastAPI 응답을 받아 표시하기. """
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5175"],
+    allow_origins=["http://localhost:3003"],
     allow_methods=["GET"]
 )
 
